@@ -41,15 +41,15 @@ class BsonJsonifyTest(util.FlaskRequestTest):
 
         assert jsonified_bson == jsonified
 
-    def test_jsonify_Code(self):
-        code = Code("function () { console.log('Hello, world!'); }();")
-        json = {'a': 1, 'code': code}
-        safe_json = {'a': 1, 'code': {'$code': str(code), '$scope': {}}}
-
-        jsonified_bson = jsonify(json).response
-        jsonified = flask_jsonify(safe_json).response
-
-        assert jsonified_bson == jsonified
+    # def test_jsonify_Code(self):
+    #     code = Code("function () { console.log('Hello, world!'); }();")
+    #     json = {'a': 1, 'code': code}
+    #     safe_json = {'a': 1, 'code': {'$code': str(code), '$scope': {}}}
+    #
+    #     jsonified_bson = jsonify(json).response
+    #     jsonified = flask_jsonify(safe_json).response
+    #
+    #     assert jsonified_bson == jsonified
 
     def test_jsonify_Regex(self):
         regex = Regex("bb|[^b]{2}")
