@@ -24,11 +24,17 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-__all__ = ('PyMongo', 'ASCENDING', 'DESCENDING')
+__all__ = ('PyMongo', 'ASCENDING', 'DESCENDING', 'jsonify')
 
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
+from bson import ObjectId
 from bson.errors import InvalidId
-from bson.objectid import ObjectId
-from flask import abort, current_app, request
+from bson.json_util import dumps as bson_dumps
+from flask import abort, current_app, request, jsonify as flask_jsonify
 from gridfs import GridFS, NoFile
 from mimetypes import guess_type
 from pymongo import uri_parser
@@ -355,3 +361,22 @@ class PyMongo(object):
 
         storage = GridFS(self.db, base)
         storage.put(fileobj, filename=filename, content_type=content_type)
+
+
+def jsonify(obj, *args, **kwargs):
+    """Same call signature as `flask.jsonify`.  Works with MongoDB
+    BSON objects.
+
+    .. code-block:: python
+
+        @app.route('/get_bson_doc')
+        def get_bson_doc():
+            data = bson.BSON.encode({'a': 1, 'id_': ObjectId()})
+            return jsonify(data)
+
+    :param object obj: The object to be jsonified.
+
+    :return Response response: The response object to be returned.
+    """
+
+    return flask_jsonify(**json.loads(bson_dumps(obj, *args, **kwargs)))
